@@ -15,18 +15,13 @@ $app = new Slim();
 $app->config('debug', true);
 
 $app->get('/', function() {
-
 	$page = new Page();
-
 	$page->setTpl("index");
 });
 
 $app->get('/admin', function() {
-
 	User::verifyLogin();
-
 	$page = new PageAdmin();
-
 	$page->setTpl("index");
 });
 
@@ -156,6 +151,7 @@ $app->post("/admin/forgot/reset", function(){
 	$page->setTpl("forgot-reset-success");
 });
 
+// Configuração de rotas para categorias
 $app->get("/admin/categories", function(){
 	User::verifyLogin();
 	$categories = Category::listAll();
@@ -203,8 +199,18 @@ $app->post("/admin/categories/:idcategory", function($idcategory){
 	$category->get((int)$idcategory);
 	$category->setData($_POST);
 	$category->save();
-	header("Location: /admin/categories");
+	header('Location: /admin/categories');
 	exit;
+});
+
+$app->get("/categories/:idcategory", function($idcategory){
+	$category = new Category();
+	$category->get((int)$idcategory);
+	$page = new Page();
+	$page->setTpl("category", [
+		'category'=>$category->getValues(),
+		'products'=>[]
+	]);
 });
 
 $app->run();
